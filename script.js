@@ -26,12 +26,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             // Verify the reset code
             const email = await auth.verifyPasswordResetCode(actionCode);
-            document.getElementById('email-display').innerText = `Resetting password for: ${email}`;
 
             // Show the password reset form
             document.getElementById('reset-form').style.display = 'block';
 
-            document.getElementById('update-password-form').addEventListener('submit', async (e) => {
+            document.getElementById('reset-button').addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const newPassword = document.getElementById('new-password').value;
