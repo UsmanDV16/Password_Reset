@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
            // const email = await auth.verifyPasswordResetCode(actionCode);
 
             // Show the password reset form
-            document.getElementById('reset-form').style.display = 'block';
+            //document.getElementById('reset-form').style.display = 'block';
 
             document.getElementById('reset-button').addEventListener('submit', async (e) => {
                 e.preventDefault();
