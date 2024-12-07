@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (mode === 'resetPassword') {
         try {
             // Verify the reset code
-            const email = await auth.verifyPasswordResetCode(actionCode);
+           // const email = await auth.verifyPasswordResetCode(actionCode);
 
             // Show the password reset form
             document.getElementById('reset-form').style.display = 'block';
