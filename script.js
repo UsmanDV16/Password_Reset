@@ -1,5 +1,6 @@
 // Firebase Configuration (Replace this with your Firebase config object)
-const firebaseConfig = {
+// Initialize Firebase
+firebase.initializeApp({
     apiKey: "AIzaSyANYegXiQWj4sPNofab-QqjzHVTQTZ5Obw",
     authDomain: "quickbazaar-ebb6e.firebaseapp.com",
     databaseURL: "https://quickbazaar-ebb6e-default-rtdb.firebaseio.com",
@@ -7,49 +8,55 @@ const firebaseConfig = {
     storageBucket: "quickbazaar-ebb6e.firebasestorage.app",
     messagingSenderId: "931346736760",
     appId: "1:931346736760:web:35e820e58930b727136f8d"
-  };
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-// Reference to the form
-const form = document.getElementById('update-password-form');
-
-// Listen for the form submission
-form.addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent the form from refreshing the page
-
-    // Get password input values
-    const newPassword = document.getElementById('new-password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
-
-    // Validate passwords
-    if (newPassword !== confirmPassword) {
-        alert('Passwords do not match. Please try again.');
-        return;
-    }
-
-    try {
-        // Get current user
-        const user = auth.currentUser;
-        if (!user) {
-            alert('No user is currently signed in.');
-            return;
-        }
-
-        // Update the user's password
-        await user.updatePassword(newPassword);
-        alert('Password updated successfully!');
-    } catch (error) {
-        console.error('Error updating password:', error);
-        alert(`Error: ${error.message}`);
-    }
 });
 
+const auth = firebase.auth();
 
+// Helper function to get URL parameters
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
 
+document.addEventListener('DOMContentLoaded', async () => {
+    const actionCode = getQueryParam('oobCode');
+    const mode = getQueryParam('mode');
 
+    if (mode === 'resetPassword') {
+        try {
+            // Verify the reset code
+            const email = await auth.verifyPasswordResetCode(actionCode);
+            document.getElementById('email-display').innerText = `Resetting password for: ${email}`;
 
+            // Show the password reset form
+            document.getElementById('reset-form').style.display = 'block';
 
+            document.getElementById('update-password-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
 
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (newPassword !== confirmPassword) {
+                    alert('Passwords do not match. Please try again.');
+                    return;
+                }
+
+                try {
+                    // Confirm the password reset
+                    await auth.confirmPasswordReset(actionCode, newPassword);
+                    alert('Password updated successfully! You can now log in with your new password.');
+                    window.location.href = 'login.html'; // Redirect to your login page
+                } catch (error) {
+                    console.error('Error confirming password reset:', error);
+                    alert(`Error: ${error.message}`);
+                }
+            });
+        } catch (error) {
+            console.error('Error verifying password reset code:', error);
+            alert('Invalid or expired password reset link.');
+        }
+    } else {
+        alert('Invalid mode. Please use the password reset link provided in your email.');
+    }
+});
