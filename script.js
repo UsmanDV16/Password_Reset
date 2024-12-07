@@ -22,40 +22,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const actionCode = getQueryParam('oobCode');
     const mode = getQueryParam('mode');
 
-    if (mode === 'resetPassword') {
-        try {
-            // Verify the reset code
-           // const email = await auth.verifyPasswordResetCode(actionCode);
-
-            // Show the password reset form
-            //document.getElementById('reset-form').style.display = 'block';
-
-            document.getElementById('reset-button').addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const newPassword = document.getElementById('new-password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-
-                if (newPassword !== confirmPassword) {
-                    alert('Passwords do not match. Please try again.');
-                    return;
-                }
-
-                try {
-                    // Confirm the password reset
-                    await auth.confirmPasswordReset(actionCode, newPassword);
-                    alert('Password updated successfully! You can now log in with your new password.');
-                    window.location.href = 'login.html'; // Redirect to your login page
-                } catch (error) {
-                    console.error('Error confirming password reset:', error);
-                    alert(`Error: ${error.message}`);
-                }
-            });
-        } catch (error) {
-            console.error('Error verifying password reset code:', error);
-            alert('Invalid or expired password reset link.');
-        }
-    } else {
-        alert('Invalid mode. Please use the password reset link provided in your email.');
+    if (!actionCode || mode !== 'resetPassword') {
+        alert('Invalid mode or missing action code. Please use the link from your email.');
+        return;
     }
+
+    const resetForm = document.getElementById('reset-form');
+    resetForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent default form submission
+
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (newPassword !== confirmPassword) {
+            alert('Passwords do not match. Please try again.');
+            return;
+        }
+
+        try {
+            // Confirm the password reset with Firebase
+            await auth.confirmPasswordReset(actionCode, newPassword);
+            alert('Password updated successfully! You can now log in with your new password.');
+            window.location.href = 'login.html'; // Redirect to your login page
+        } catch (error) {
+            console.error('Error confirming password reset:', error);
+            alert(`Error: ${error.message}`);
+        }
+    });
 });
